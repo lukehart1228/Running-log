@@ -56,7 +56,7 @@
   .brand{ font-family:'Oswald', sans-serif; font-weight:700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); }
   .text-btn{ background:none; border:none; color: var(--ink-soft); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; padding: 8px 4px; cursor:pointer; border-bottom: 1px dotted var(--ink-soft); }
   .text-btn:hover{ color: var(--warn); border-color: var(--warn); }
-  .headline{ margin-top: 14px; display:flex; gap: 22px; }
+  .headline{ margin-top: 14px; display:flex; flex-wrap: wrap; gap: 18px; row-gap: 12px; }
   .headline-stat .num{ font-family:'Oswald', sans-serif; font-weight:700; font-size: 26px; line-height:1.1; color: var(--ink); }
   .headline-stat .lbl{ font-size: 11px; color: var(--ink-soft); margin-top: 2px; text-transform:uppercase; letter-spacing:0.5px; }
   .tabs{ display:flex; margin: 0 14px; background: var(--card); border-radius: 0 0 14px 14px; padding: 6px; gap: 4px; }
@@ -147,6 +147,10 @@
       <div class="headline-stat">
         <div class="num display" id="weekMiles">0</div>
         <div class="lbl">Miles this week</div>
+      </div>
+      <div class="headline-stat">
+        <div class="num display" id="weekCalories">0</div>
+        <div class="lbl">Calories this week</div>
       </div>
       <div class="headline-stat">
         <div class="num display" id="totalRuns">0</div>
@@ -312,8 +316,12 @@ function renderMasthead(){
   const dow = now.getDay(); // 0=Sun
   const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - dow);
   const startISO = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth()+1).padStart(2,'0')}-${String(startOfWeek.getDate()).padStart(2,'0')}`;
-  const weekMiles = runs.filter(r => r.date >= startISO && r.date <= todayISO()).reduce((s,r) => s + r.mileage, 0);
+  const weekRuns = runs.filter(r => r.date >= startISO && r.date <= todayISO());
+  const weekMiles = weekRuns.reduce((s,r) => s + r.mileage, 0);
+  const weekCalories = weekRuns.reduce((s,r) => s + (r.calGross || 0), 0);
+  const anyWeekCalData = weekRuns.some(r => r.calGross);
   document.getElementById('weekMiles').textContent = weekMiles.toFixed(1);
+  document.getElementById('weekCalories').textContent = anyWeekCalData ? weekCalories.toLocaleString() : '—';
   document.getElementById('totalRuns').textContent = String(runs.length);
 }
 
